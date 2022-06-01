@@ -65,10 +65,12 @@ class MainWindow(QMainWindow):
         # Title
         MembersTitle = QLabel('Members')
         MembersTitle.setAlignment(QtCore.Qt.AlignCenter)
+        MembersTitle.setFixedHeight(150)
 
-        # add, delete and information Buttons
+        # add, delete, edit and information Buttons
         MembersAddButton = QPushButton('Add')
         MembersDeleteButton = QPushButton('Delete')
+        MembersEditButton = QPushButton('Edit')
         MembersSpacer = QSpacerItem(100, 10, QSizePolicy.Expanding)
         MmebersInfoButton = QPushButton('Full Information')
 
@@ -76,6 +78,7 @@ class MainWindow(QMainWindow):
         MembersButtonsLayout = QHBoxLayout()
         MembersButtonsLayout.addWidget(MembersAddButton)
         MembersButtonsLayout.addWidget(MembersDeleteButton)
+        MembersButtonsLayout.addWidget(MembersEditButton)
         MembersButtonsLayout.addSpacerItem(MembersSpacer)
         MembersButtonsLayout.addWidget(MmebersInfoButton)
         MembersButtonsWidget = QtWidgets.QWidget(self)
@@ -103,10 +106,12 @@ class MainWindow(QMainWindow):
         # Title
         BooksTitle = QLabel('Books')
         BooksTitle.setAlignment(QtCore.Qt.AlignCenter)
+        BooksTitle.setFixedHeight(150)
 
-        # add, delete and information Buttons
+        # add, delete, edit and information Buttons
         BooksAddButton = QPushButton('Add')
         BooksDeleteButton = QPushButton('Delete')
+        BooksEditButton = QPushButton('Edit')
         BooksSpacer = QSpacerItem(100, 10, QSizePolicy.Expanding)
         BooksInfoButton = QPushButton('Full Information')
 
@@ -114,6 +119,7 @@ class MainWindow(QMainWindow):
         BooksButtonsLayout = QHBoxLayout()
         BooksButtonsLayout.addWidget(BooksAddButton)
         BooksButtonsLayout.addWidget(BooksDeleteButton)
+        BooksButtonsLayout.addWidget(BooksEditButton)
         BooksButtonsLayout.addSpacerItem(BooksSpacer)
         BooksButtonsLayout.addWidget(BooksInfoButton)
         BooksButtonsWidget = QtWidgets.QWidget(self)
@@ -123,7 +129,7 @@ class MainWindow(QMainWindow):
         BooksSearchBox = QLineEdit()
         BooksSearchBox.setAlignment(QtCore.Qt.AlignCenter)
 
-        # Members Table
+        # Books Table
         BooksTable = QTableWidget()
 
         # adding Widgets
