@@ -1,5 +1,3 @@
-from ctypes import alignment
-from tkinter import CENTER
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow,
