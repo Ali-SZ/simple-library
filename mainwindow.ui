@@ -216,7 +216,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="MembersPage">
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -349,7 +349,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="MembersListWidget">
+         <widget class="QTableView" name="MembersTableView">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -418,7 +418,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="MemberInfoButton">
+            <widget class="QPushButton" name="EditMemberButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -432,7 +432,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Member's Information</string>
+              <string>Edit Member's Information</string>
              </property>
             </widget>
            </item>
@@ -548,7 +548,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="BooksListWdget">
+         <widget class="QTableView" name="BooksTableView">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -611,7 +611,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_5">
+            <widget class="QPushButton" name="EditBookButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -625,7 +625,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Book's Information</string>
+              <string>Edit Book's Information</string>
              </property>
             </widget>
            </item>
