@@ -1,7 +1,7 @@
-from UI import *
+import UI
 
 def main():
-    ShowWindows()
+    UI.ShowWindows()
 
 if __name__ == "__main__":
     main()

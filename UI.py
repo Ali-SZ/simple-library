@@ -1,12 +1,11 @@
-from tkinter.messagebox import NO, YES
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QHeaderView, QTabWidget, QMessageBox, QDateEdit,
+    QApplication, QMainWindow, QWidget, QHeaderView, QTabWidget, QMessageBox, QDateEdit, QTableView,
     QHBoxLayout, QVBoxLayout, QFormLayout, QSpinBox, QGridLayout,
     QListWidget, QListWidgetItem, QPushButton, QStackedWidget, QLabel, QSpacerItem, QLineEdit, QTableWidget,
     QSizePolicy
 )
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QStandardItemModel
 from PyQt5.QtCore import QSize, QPropertyAnimation, QSortFilterProxyModel, QDate
 from PyQt5.QtSql import *
 
@@ -18,6 +17,8 @@ import sys
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        
+        self.isMenuOpen = True
         
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -40,6 +41,7 @@ class MainWindow(QMainWindow):
     
     def clickedButtons_init(self):
         # - for Menu Buttons
+        self.ui.MenuButton.clicked.connect(self.menuButtonClicked)
         self.ui.ToMemebersPageButton.clicked.connect(self.gotoMembersPage)
         self.ui.ToBooksPageButton.clicked.connect(self.gotoBooksPage)
         self.ui.ToBorrowPageButton.clicked.connect(self.gotoBorrowsPage)
@@ -52,6 +54,7 @@ class MainWindow(QMainWindow):
         self.ui.DeleteBookButton.clicked.connect(self.deleteBookButtonClicked)
         self.ui.EditBookButton.clicked.connect(self.editBookButtonClicked)
         self.ui.AddBorrowButton.clicked.connect(self.borrowButtonClicked)
+        self.ui.ReturnBorrowButton.clicked.connect(self.returnBorrowButtonClicked)
         
     def searchBoxesTextChanged(self):
         self.ui.MembersSearchBox.textChanged.connect(self.searchMembers)
@@ -63,7 +66,6 @@ class MainWindow(QMainWindow):
         self.ui.ToMemebersPageButton.setIcon(QIcon(MEMBERS_ICON_LOCATION))
         self.ui.ToBooksPageButton.setIcon(QIcon(BOOKS_ICON_LOCATION))
         self.ui.ToBorrowPageButton.setIcon(QIcon(BORROWS_ICON_LOCATION))
-        self.ui.SettingButton.setIcon(QIcon(SETTING_ICON_LOCATION))
         
         # - for Pages
         self.ui.MembersImage.setPixmap(QPixmap(MEMBERS_ICON_LOCATION))
@@ -72,6 +74,31 @@ class MainWindow(QMainWindow):
     
     
     # ********************* Signals *********************
+    # - for Menu Animation
+    def menuButtonClicked(self):
+        print('hello')
+        self.menuAnimation = QPropertyAnimation(self.ui.MenuButton, b'minimumWidth')
+        self.menuAnimation.setDuration(200)
+        
+        if self.isMenuOpen:
+            self.menuAnimation.setStartValue(OPEN_MENU_WIDTH)
+            self.menuAnimation.setEndValue(CLOSED_MENU_WIDTH)
+            self.ui.MenuButton.setText('')
+            self.ui.ToMemebersPageButton.setText('')
+            self.ui.ToBooksPageButton.setText('')
+            self.ui.ToBorrowPageButton.setText('')
+            self.isMenuOpen = False
+        else:
+            self.menuAnimation.setStartValue(CLOSED_MENU_WIDTH)
+            self.menuAnimation.setEndValue(OPEN_MENU_WIDTH)
+            self.ui.MenuButton.setText('  Menu')
+            self.ui.ToMemebersPageButton.setText('  Members')
+            self.ui.ToBooksPageButton.setText('  Books')
+            self.ui.ToBorrowPageButton.setText('  Borrows')
+            self.isMenuOpen = True
+        
+        self.menuAnimation.start()
+            
     # - for Menu Buttons
     def gotoMembersPage(self):
         self.ui.Pages.setCurrentIndex(0)
@@ -112,6 +139,13 @@ class MainWindow(QMainWindow):
     def borrowButtonClicked(self):
         self.borrowWindow = setBorrowedWindow(self)
         self.borrowWindow.show()
+    def returnBorrowButtonClicked(self):
+        mayIReturn = QMessageBox.question(self, 'Return Books', 'Does member returned these books?',
+                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if mayIReturn == QMessageBox.Yes:
+            borrowID = self.ui.BorrowsTableView.selectedIndexes()[0].data()
+            returnBorrow(borrowID)
+            self.refreshBorrowsTable()
     
     # - for Search
     def searchBooks(self):
@@ -144,6 +178,7 @@ class MainWindow(QMainWindow):
         self.membersTableModel.setTable('members')
         self.membersTableModel.select()
         self.ui.MembersTableView.setModel(self.membersTableModel)
+        self.ui.MembersTableView.resizeColumnsToContents()
         self.database.close()
         
     def refreshBooksTable(self):
@@ -153,6 +188,7 @@ class MainWindow(QMainWindow):
         self.booksTableModel.setTable('books')
         self.booksTableModel.select()
         self.ui.BooksTableView.setModel(self.booksTableModel)
+        self.ui.BooksTableView.resizeColumnsToContents()
         self.database.close()
         
     def refreshBorrowsTable(self):
@@ -162,6 +198,7 @@ class MainWindow(QMainWindow):
         self.borrowsTableModel.setTable('borrows')
         self.borrowsTableModel.select()
         self.ui.BorrowsTableView.setModel(self.borrowsTableModel)
+        self.ui.BorrowsTableView.resizeColumnsToContents()
         self.database.close()
         
 
@@ -339,11 +376,14 @@ class setBorrowedWindow(QWidget):
         
         self.member_id_title = QLabel(self, text='Member ID')
         self.member_id_input = QLineEdit(self)
+        self.member_id_input.setReadOnly(True)
         self.member_id_selector = QPushButton(self, text='Select Member From Table')
         self.member_id_selector.clicked.connect(self.selectFromMembersTable)
         
         self.book_ids_title = QLabel(self, text='Book IDs')
         self.book_ids_input = QLineEdit(self)
+        self.book_ids_input.setReadOnly(True)
+        self.book_ids_input.textChanged.connect(self.removeFirstComma)
         self.book_ids_selector = QPushButton(self, text='Add Book From Table')
         self.book_ids_selector.clicked.connect(self.addFromBooksTable)
         
@@ -390,8 +430,11 @@ class setBorrowedWindow(QWidget):
         else:
             QMessageBox.warning(self, 'Error', 'This book is already in the list')
             
+    def removeFirstComma(self):
+        if self.book_ids_input.text()[0] == ',':
+            self.book_ids_input.setText(self.book_ids_input.text()[1:])
+            
     def submit(self):
-        
         if self.member_id_input.text() == '' or self.book_ids_input.text() == '':
             QMessageBox.warning(self, 'Error', 'Please fill all the fields')
         else:
@@ -404,9 +447,8 @@ class setBorrowedWindow(QWidget):
                            self.return_date_input.date().toString('yyyy-MM-dd'))
                 self.parentWindow.refreshBorrowsTable()
                 self.close()
-        
-        
 
+        
 def ShowWindows():
     app = QApplication(sys.argv)
     mainWin = MainWindow()
