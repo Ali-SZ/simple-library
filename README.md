@@ -1,3 +1,3 @@
 # Simple Library
 
-A simple Library managment application with PyQt5 and Sqlite3
+A simple library management application using PyQt5 and Sqlite3
