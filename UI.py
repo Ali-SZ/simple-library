@@ -11,6 +11,7 @@ from PyQt5.QtSql import *
 
 from mainwindow_ui import Ui_MainWindow
 from database_connection import *
+from stylesheets import *
 
 import sys
 
@@ -26,6 +27,7 @@ class MainWindow(QMainWindow):
         self.clickedButtons_init()
         self.icons_init()
         self.database_init()
+        self.stylesheet_init()
         
     
     # ********************* Initializers *********************
@@ -71,12 +73,15 @@ class MainWindow(QMainWindow):
         self.ui.MembersImage.setPixmap(QPixmap(MEMBERS_ICON_LOCATION))
         self.ui.BooksImage.setPixmap(QPixmap(BOOKS_ICON_LOCATION))
         self.ui.BorrowsImage.setPixmap(QPixmap(BORROWS_ICON_LOCATION))
+        
+    def stylesheet_init(self):
+        self.ui.MenuButtonsFrame.setStyleSheet(MENU_FRAME_STYLE)
+        self.ui.Pages.setStyleSheet(PAGES_STYLE)
     
     
     # ********************* Signals *********************
     # - for Menu Animation
     def menuButtonClicked(self):
-        print('hello')
         self.menuAnimation = QPropertyAnimation(self.ui.MenuButton, b'minimumWidth')
         self.menuAnimation.setDuration(200)
         

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>981</width>
+    <width>991</width>
     <height>600</height>
    </rect>
   </property>
@@ -59,17 +59,20 @@
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>5</number>
+       </property>
        <property name="leftMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <item alignment="Qt::AlignTop">
         <widget class="QPushButton" name="MenuButton">
@@ -203,7 +206,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="MembersPage">
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -211,16 +214,16 @@
          <number>6</number>
         </property>
         <property name="leftMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <item>
          <widget class="QWidget" name="widget" native="true">
@@ -334,7 +337,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Add New Member</string>
+              <string>   Add New Member   </string>
              </property>
             </widget>
            </item>
@@ -353,7 +356,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Delete Member</string>
+              <string>   Delete Member   </string>
              </property>
             </widget>
            </item>
@@ -372,7 +375,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Edit Member's Information</string>
+              <string>   Edit Member's Information   </string>
              </property>
             </widget>
            </item>
@@ -387,16 +390,16 @@
          <number>6</number>
         </property>
         <property name="leftMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <item>
          <widget class="QWidget" name="widget_3" native="true">
@@ -495,7 +498,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Add New Book</string>
+              <string>   Add New Book   </string>
              </property>
             </widget>
            </item>
@@ -514,7 +517,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Delete Book</string>
+              <string>   Delete Book   </string>
              </property>
             </widget>
            </item>
@@ -533,7 +536,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Edit Book's Information</string>
+              <string>   Edit Book's Information   </string>
              </property>
             </widget>
            </item>
@@ -558,16 +561,16 @@
       <widget class="QWidget" name="BorrowPage">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="bottomMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <item>
          <widget class="QWidget" name="widget_8" native="true">
@@ -668,7 +671,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Add Borrow</string>
+              <string>   Add Borrow   </string>
              </property>
             </widget>
            </item>
@@ -687,7 +690,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Return Borrow</string>
+              <string>   Return Borrow   </string>
              </property>
             </widget>
            </item>
