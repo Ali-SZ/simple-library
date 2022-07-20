@@ -70,12 +70,18 @@ def borrowBook(member_id, book_ids, borrow_date, return_date):
     conn = databaseConnection()
     c = conn.cursor()
     c.execute(ADD_NEW_BORROW.format(member_id, book_ids, borrow_date, return_date))
+    c.execute(MEMBER_CLOSE_PERMISSION.format(member_id))
+    for id in book_ids.split(','):
+        c.execute(BOOK_LOWER_QUANTITY.format(id))
     conn.commit()
     conn.close()
     
-def returnBorrow(id):
+def returnBorrow(id, member_id, book_ids):
     conn = databaseConnection()
     c = conn.cursor()
     c.execute(DELETE_BORROW.format(id))
+    c.execute(MEMBER_GIVE_PERMISSION.format(member_id))
+    for id in book_ids.split(','):
+        c.execute(BOOK_RAISE_QUANTITY.format(id))
     conn.commit()
     conn.close()

@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
         self.icons_init()
         self.database_init()
         self.stylesheet_init()
+        self.ui.Pages.setCurrentIndex(0)
         
     
     # ********************* Initializers *********************
@@ -149,7 +150,11 @@ class MainWindow(QMainWindow):
                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if mayIReturn == QMessageBox.Yes:
             borrowID = self.ui.BorrowsTableView.selectedIndexes()[0].data()
-            returnBorrow(borrowID)
+            memberID = self.ui.BorrowsTableView.selectedIndexes()[1].data()
+            bookIDs = self.ui.BorrowsTableView.selectedIndexes()[2].data()
+            returnBorrow(borrowID, memberID, bookIDs)
+            self.refreshMembersTable()
+            self.refreshBooksTable()
             self.refreshBorrowsTable()
     
     # - for Search
@@ -224,9 +229,9 @@ class addNewRowWindow(QWidget):
         
         input_list = []
         if(self.type == 'member'):
-            input_list = MEMBERS_HEADERS_LIST
+            input_list = MEMBERS_HEADERS_LIST.copy()
         else:
-            input_list = BOOKS_HEADERS_LIST
+            input_list = BOOKS_HEADERS_LIST.copy()
             input_list.pop()
             
         for input_data in input_list:
@@ -387,7 +392,6 @@ class setBorrowedWindow(QWidget):
         
         self.book_ids_title = QLabel(self, text='Book IDs')
         self.book_ids_input = QLineEdit(self)
-        self.book_ids_input.setReadOnly(True)
         self.book_ids_input.textChanged.connect(self.removeFirstComma)
         self.book_ids_selector = QPushButton(self, text='Add Book From Table')
         self.book_ids_selector.clicked.connect(self.addFromBooksTable)
@@ -406,9 +410,33 @@ class setBorrowedWindow(QWidget):
         self.return_date_input.setMinimumDate(QDate.currentDate())
         self.return_date_input.setMaximumDate(QDate.currentDate().addDays(30))
         
+        self.parentWindow.database.open()
+        
+        self.members_table = QTableView(self)
+        self.members_table.setSelectionBehavior(QTableView.SelectRows)
+        self.members_table.setSelectionMode(QTableView.SingleSelection)
+        self.members_table.setEditTriggers(QTableView.NoEditTriggers)
+        self.members_table_model = QSqlTableModel(self, self.parentWindow.database)
+        self.members_table_model.setTable('members')
+        self.members_table_model.select()
+        self.members_table.setModel(self.members_table_model)
+        self.members_table.resizeColumnsToContents()
+        
+        self.books_table = QTableView(self)
+        self.books_table.setSelectionBehavior(QTableView.SelectRows)
+        self.books_table.setSelectionMode(QTableView.SingleSelection)
+        self.books_table.setEditTriggers(QTableView.NoEditTriggers)
+        self.books_table_model = QSqlTableModel(self, self.parentWindow.database)
+        self.books_table_model.setTable('books')
+        self.books_table_model.select()
+        self.books_table.setModel(self.books_table_model)
+        self.books_table.resizeColumnsToContents()
+        
+        self.parentWindow.database.close()
+        
         self.tables_tabs= QTabWidget(self)
-        self.tables_tabs.addTab(self.parentWindow.ui.MembersTableView, 'Members')
-        self.tables_tabs.addTab(self.parentWindow.ui.BooksTableView, 'Books')
+        self.tables_tabs.addTab(self.members_table, 'Members')
+        self.tables_tabs.addTab(self.books_table, 'Books')
         
         self.submitButton = QPushButton('Submit', self)
         self.submitButton.clicked.connect(self.submit)
@@ -427,11 +455,11 @@ class setBorrowedWindow(QWidget):
         self.centralLayout.addWidget(self.submitButton, 5, 0, 1, 3)
         
     def selectFromMembersTable(self):
-        self.member_id_input.setText(str(self.parentWindow.ui.MembersTableView.selectedIndexes()[0].data()))
+        self.member_id_input.setText(str(self.members_table.selectedIndexes()[0].data()))
         
     def addFromBooksTable(self):
-        if str(self.parentWindow.ui.BooksTableView.selectedIndexes()[0].data()) not in self.book_ids_input.text():
-            self.book_ids_input.setText(self.book_ids_input.text() + ',' + str(self.parentWindow.ui.BooksTableView.selectedIndexes()[0].data()))
+        if str(self.books_table.selectedIndexes()[0].data()) not in self.book_ids_input.text():
+            self.book_ids_input.setText(self.book_ids_input.text() + ',' + str(self.books_table.selectedIndexes()[0].data()))
         else:
             QMessageBox.warning(self, 'Error', 'This book is already in the list')
             
@@ -439,19 +467,38 @@ class setBorrowedWindow(QWidget):
         if self.book_ids_input.text()[0] == ',':
             self.book_ids_input.setText(self.book_ids_input.text()[1:])
             
+    def doesMemberHavePremission(self):
+        if self.members_table.selectedIndexes()[5].data() == 1:
+            return True
+        return False
+    
+    def areBooksAvailable(self):
+        for book_id in self.book_ids_input.text().split(','):
+            if self.books_table.selectedIndexes()[5].data() == 0:
+                return False
+        return True
+            
     def submit(self):
         if self.member_id_input.text() == '' or self.book_ids_input.text() == '':
             QMessageBox.warning(self, 'Error', 'Please fill all the fields')
         else:
-            mayisubmitBorrow = QMessageBox.question(self, 'Confirmation', 'Are you sure you want to submit this borrow?',
-                                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if mayisubmitBorrow == QMessageBox.Yes:
-                borrowBook(self.member_id_input.text(),
-                           self.book_ids_input.text(),
-                           self.borrow_date_input.date().toString('yyyy-MM-dd'),
-                           self.return_date_input.date().toString('yyyy-MM-dd'))
-                self.parentWindow.refreshBorrowsTable()
-                self.close()
+            if self.doesMemberHavePremission():
+                if self.areBooksAvailable():
+                    mayisubmitBorrow = QMessageBox.question(self, 'Confirmation', 'Are you sure you want to submit this borrow?',
+                                                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    if mayisubmitBorrow == QMessageBox.Yes:
+                        borrowBook(self.member_id_input.text(),
+                                self.book_ids_input.text(),
+                                self.borrow_date_input.date().toString('yyyy-MM-dd'),
+                                self.return_date_input.date().toString('yyyy-MM-dd'))
+                        self.parentWindow.refreshMembersTable()
+                        self.parentWindow.refreshBooksTable()
+                        self.parentWindow.refreshBorrowsTable()
+                        self.close()
+                else:
+                    QMessageBox.warning(self, 'Error', 'One or more books are not available')
+            else:
+                QMessageBox.warning(self, 'Error', 'This member does not have permission to borrow books')
 
         
 def ShowWindows():
